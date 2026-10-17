@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InfoOlimp — Informatika olimpiadasiga tayyorgarlik</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#182235;--muted:#64748b;--line:#dce4ef;--blue:#2457d6;--blue2:#eaf0ff;--green:#16794b;--red:#bd3030;--orange:#a35b00}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(120deg,#10234e,#2457d6);color:white;padding:30px 18px 25px}
+.wrap{max-width:1100px;margin:auto}header .tag{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;opacity:.8}h1{font-size:clamp(1.8rem,4vw,3rem);line-height:1.1;margin:.45rem 0}header p{max-width:700px;color:#e1eaff;margin-bottom:0}
+main{padding:22px 16px 50px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:-2px}.stat,.panel,.question,.resultbox{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}.stat strong{font-size:1.45rem;display:block}.stat span{font-size:.9rem;color:var(--muted)}
+.layout{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px}.panel h2,.panel h3{margin:.2rem 0 .8rem}.filters{position:sticky;top:12px;align-self:start}.field{margin:13px 0}.field label{display:block;font-weight:650;margin-bottom:6px}.field select,.field input{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink);font:inherit}
+.btn{border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer;background:var(--blue);color:white}.btn.secondary{background:var(--blue2);color:var(--blue)}.btn.ghost{background:#f1f5f9;color:#334155}.btn:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.muted{color:var(--muted);font-size:.92rem}.pill{display:inline-block;padding:4px 9px;background:var(--blue2);color:var(--blue);border-radius:99px;font-size:.8rem;font-weight:700}
+.progress{height:8px;background:#e5eaf2;border-radius:99px;overflow:hidden;margin:12px 0 20px}.progress div{height:100%;background:var(--blue);width:0;transition:width .2s}
+.question{margin-top:12px}.qmeta{color:var(--muted);font-size:.85rem;display:flex;gap:8px;flex-wrap:wrap}.question h3{font-size:1.12rem;margin:10px 0 14px}.option{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:11px;margin:8px 0;cursor:pointer}.option:hover{border-color:#9cb4f5;background:#f8faff}.option input{margin-top:5px;accent-color:var(--blue)}.option.chosen{border-color:var(--blue);background:#f2f6ff}
+.feedback{margin-top:12px;border-radius:10px;padding:12px;background:#f1f5f9}.correct{color:var(--green);font-weight:750}.wrong{color:var(--red);font-weight:750}.hidden{display:none!important}
+.resultgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.resultgrid .stat{padding:12px}.resultgrid strong{font-size:1.3rem}
+details{border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin:9px 0;background:white}summary{font-weight:700;cursor:pointer}.source a{color:var(--blue);overflow-wrap:anywhere}.source li{margin:10px 0}.notice{border-left:4px solid #f0a020;padding:10px 12px;background:#fff8e8;border-radius:8px;color:#68400a;font-size:.92rem}
+footer{text-align:center;color:var(--muted);padding:22px;font-size:.88rem}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.filters{position:static}.stats{grid-template-columns:1fr 1fr 1fr}.resultgrid{grid-template-columns:1fr 1fr 1fr}}@media(max-width:480px){.stats{grid-template-columns:1fr}.resultgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="tag">O‘rgan · Mashq qil · Tahlil qil</div><h1>InfoOlimp</h1><p>9-, 10- va 11-sinflar uchun informatika olimpiadasiga tayyorgarlik. Variantli testlar, natijalar va xatolar tahlili — barchasi bitta sahifada.</p></div></header>
+<main class="wrap">
+<section class="stats">
+<div class="stat"><strong id="totalCount">45+</strong><span>mashq savollari</span></div>
+<div class="stat"><strong>3 sinf</strong><span>9 · 10 · 11-sinflar</span></div>
+<div class="stat"><strong>A–D</strong><span>har savolga 4 variant</span></div>
+</section>
+<div class="layout">
+<aside class="panel filters">
+<h2>Testni sozlash</h2>
+<div class="field"><label for="grade">Sinf</label><select id="grade"><option value="all">Barcha sinflar</option><option value="9">9-sinf</option><option value="10">10-sinf</option><option value="11">11-sinf</option></select></div>
+<div class="field"><label for="topic">Mavzu</label><select id="topic"><option value="all">Barcha mavzular</option><option value="Sanoq sistemalari">Sanoq sistemalari</option><option value="Mantiq">Mantiq</option><option value="Algoritmlar">Algoritmlar</option><option value="Python">Python</option><option value="Kompyuter savodxonligi">Kompyuter savodxonligi</option><option value="Ma’lumotlar">Ma’lumotlar</option></select></div>
+<div class="field"><label for="year">Material turi</label><select id="year"><option value="practice">Mashq savollari</option><option value="2025">2025-yil manbalari</option><option value="2024">2024-yil manbalari</option><option value="2023">2023-yil manbalari</option></select></div>
+<div class="field"><label for="count">Testdagi savollar</label><select id="count"><option>10</option><option selected>15</option><option>20</option><option>30</option><option value="all">Barcha mos savollar</option></select></div>
+<div class="actions"><button type="button" class="btn" id="startBtn">Testni boshlash</button><button type="button" class="btn secondary" id="resetBtn">Tozalash</button></div>
+<p class="muted">Testni boshlaganingdan keyin javoblarni tanla. “Natijani tekshirish” tugmasi to‘g‘ri javoblar va izohlarni ko‘rsatadi.</p>
+</aside>
+<section>
+<div class="panel" id="intro">
+<div class="topline"><h2>Bilimingni sinab ko‘r</h2><span class="pill">150 ta original mashq</span></div>
+<p>Test savollari informatika olimpiadasida uchraydigan mavzular bo‘yicha tayyorlangan. Ular rasmiy imtihon savollarining aynan ko‘chirmasi emas.</p>
+<div class="notice">2023–2025-yillardagi rasmiy/oldingi topshiriqlarni alohida manba havolalari orqali ko‘rishing mumkin. Bu sahifadagi mashq savollari esa mustaqil tuzilgan.</div>
+</div>
+<div id="testArea" class="hidden">
+<div class="panel">
+<div class="topline"><div><h2 id="testTitle">Test</h2><div class="muted" id="testSub"></div></div><span class="pill" id="counter">1 / 15</span></div>
+<div class="progress"><div id="progressFill"></div></div>
+<div id="questionMount"></div>
+<div class="actions"><button type="button" class="btn ghost" id="prevBtn">← Oldingi</button><button type="button" class="btn secondary" id="nextBtn">Keyingi →</button><button type="button" class="btn" id="submitBtn">Natijani tekshirish</button></div>
+</div>
+</div>
+<div id="results" class="hidden"></div>
+<div class="panel source" style="margin-top:16px">
+<h2>2023–2025-yil olimpiada materiallari</h2>
+<p class="muted">Havolalar tashqi saytlarga olib boradi. PDF fayllar mazmuni va mavjudligi manba saytiga bog‘liq.</p>
+<ul>
+<li><strong>2025 — hududiy bosqich, 9–11-sinflar:</strong> <a href="https://vooo.uz/fan-olimpiadasi/informatika-fan-olimpiadasi/36-%D0%BE%D0%BB%D0%B8%D0%BC%D0%BF%D0%B8%D0%B0%D0%B4%D0%B0-%D0%BF%D0%BE-%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%82%D0%B8%D0%BA%D0%B5-%D0%B8-%D0%B8%D0%BA%D1%82-%E2%80%94-%D0%B7%D0%B0%D0%B4%D0%B0%D0%BD%D0%B8%D1%8F-%D0%B4%D0%BB%D1%8F-9-10-11-%D0%BA%D0%BB%D0%B0%D1%81%D1%81%D0%BE%D0%B2-%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D0%BD%D0%BE%D0%B9-%D1%8D%D1%82%D0%B0%D0%BF-2025.html" target="_blank" rel="noopener">9-, 10-, 11-sinf materiallari</a></li>
+<li><strong>2024 — tuman bosqichi:</strong> <a href="https://bellashuv.uz/fan-olimpiadasi/f-o-informatika/1866-informatika-fanidan-fan-olimpiadasining-tuman-bosqichi-savollari-2023-2024-oquv-yili-.html" target="_blank" rel="noopener">2023–2024 o‘quv yili savollari</a> · <a href="https://static.imtihonlar.uz/uploads/1/10-Informatika%202024%20uzb.pdf" target="_blank" rel="noopener">10-sinf PDF</a> · <a href="https://static.imtihonlar.uz/uploads/1/11-Informatika%202024%20uzb.pdf" target="_blank" rel="noopener">11-sinf PDF</a></li>
+<li><strong>2023 — tuman bosqichi:</strong> <a href="https://bellashuv.uz/fan-olimpiadasi/1681-informatika-fanidan-asosiy-olimpiadaning-tuman-bosqichi-topshiriqlari-informatika-olimpiada-testlari-2022-2023.html" target="_blank" rel="noopener">2022–2023 o‘quv yili savollari</a></li>
+<li><strong>2024 — respublika bosqichi namunaviy testlari:</strong> <a href="https://uzbmb.uz/page/olimpiada_2024" target="_blank" rel="noopener">Bilim va malakalarni baholash agentligi</a></li>
+</ul>
+</div>
+</section>
+</div>
+</main>
+<footer>InfoOlimp · Natijalar shu brauzer sahifasida hisoblanadi.</footer>
+<script>
+const Q = [
+{g:9,t:"Sanoq sistemalari",q:"Ikkilik 101101 sonining o‘nlik qiymati nechaga teng?",o:["43","45","41","53"],a:1,e:"101101₂ = 32 + 8 + 4 + 1 = 45."},
+{g:9,t:"Mantiq",q:"A = rost, B = yolg‘on. A AND B natijasi?",o:["Rost","Yolg‘on","A ga teng","Aniqlab bo‘lmaydi"],a:1,e:"AND faqat ikkala qiymat ham rost bo‘lsa rost bo‘ladi."},
+{g:9,t:"Algoritmlar",q:"Algoritmning bir ma’noli, aniq ko‘rsatmalardan iborat bo‘lish xususiyati nima?",o:["Ommaviylik","Aniqlik","Natijaviylik","Diskretlik"],a:1,e:"Aniqlik algoritmdagi har bir ko‘rsatma tushunarli va bir ma’noli bo‘lishini bildiradi."},
+{g:9,t:"Python",q:"Python’da print(3 + 2 * 4) natijasi nima?",o:["20","11","14","24"],a:1,e:"Ko‘paytirish qo‘shishdan oldin bajariladi: 3 + 8 = 11."},
+{g:9,t:"Kompyuter savodxonligi",q:"Kompyuterning hisoblash va boshqarish amallarini bajaradigan asosiy qurilma?",o:["Monitor","Protsessor","Printer","Skaner"],a:1,e:"Protsessor buyruqlarni bajaradi va hisoblashlarni amalga oshiradi."},
+{g:9,t:"Ma’lumotlar",q:"1 bayt nechta bitdan iborat?",o:["4","8","16","1024"],a:1,e:"1 bayt = 8 bit."},
+{g:9,t:"Sanoq sistemalari",q:"O‘nlik 15 sonining ikkilik yozuvi qaysi?",o:["1010","1101","1111","1001"],a:2,e:"15 = 8 + 4 + 2 + 1, shuning uchun 1111₂."},
+{g:9,t:"Mantiq",q:"A = yolg‘on bo‘lsa, NOT A qiymati qanday?",o:["Yolg‘on","Rost","0 va 1","Aniqlanmaydi"],a:1,e:"NOT mantiqiy qiymatni teskarisiga o‘zgartiradi."},
+{g:9,t:"Python",q:"x = 7; x = x + 3; print(x) natijasi?",o:["7","3","10","21"],a:2,e:"x ning dastlabki qiymatiga 3 qo‘shilib, 10 hosil bo‘ladi."},
+{g:9,t:"Kompyuter savodxonligi",q:"Quyidagilardan qaysi biri operatsion sistema?",o:["Linux","HTML","Python","JPEG"],a:0,e:"Linux — operatsion sistema; qolganlari til yoki fayl formati."},
+{g:9,t:"Algoritmlar",q:"Blok-sxemada shartni tekshirish odatda qaysi shaklda belgilanadi?",o:["Oval","Romb","To‘g‘ri to‘rtburchak","Parallelogram"],a:1,e:"Romb shart yoki qaror nuqtasini bildiradi."},
+{g:9,t:"Ma’lumotlar",q:"1 KB = 1024 bayt deb olinsa, 3 KB necha bayt?",o:["2048","3000","3072","4096"],a:2,e:"3 × 1024 = 3072 bayt."},
+{g:9,t:"Sanoq sistemalari",q:"O‘nlik 10 soni sakkizlik sanoq sistemasida qanday yoziladi?",o:["10","12","11","14"],a:1,e:"10 = 1×8 + 2, demak 12₈."},
+{g:9,t:"Python",q:"Python’da len('olimpiada') qiymati nechaga teng?",o:["8","9","10","7"],a:1,e:"'olimpiada' so‘zida 9 ta belgi bor."},
+{g:9,t:"Mantiq",q:"A OR B qachon yolg‘on bo‘ladi?",o:["A rost, B yolg‘on","A yolg‘on, B rost","Ikkalasi yolg‘on","Ikkalasi rost"],a:2,e:"OR faqat ikkala operand ham yolg‘on bo‘lganda yolg‘on."},
+
+{g:10,t:"Sanoq sistemalari",q:"O‘nlik 45 sonini ikkilik sanoq sistemasida yozing.",o:["101101","101011","110101","111001"],a:0,e:"45 = 32 + 8 + 4 + 1 = 101101₂."},
+{g:10,t:"Python",q:"Quyidagi kod natijasi: for i in range(2, 6): print(i, end='')",o:["23456","2345","12345","3456"],a:1,e:"range(2, 6) 2, 3, 4, 5 qiymatlarini beradi; 6 kirmaydi."},
+{g:10,t:"Algoritmlar",q:"Chiziqli qidiruvning eng yomon holatdagi vaqt murakkabligi n ta element uchun?",o:["O(1)","O(log n)","O(n)","O(n²)"],a:2,e:"Eng yomon holatda har bir element tekshirilishi mumkin: O(n)."},
+{g:10,t:"Mantiq",q:"A = rost, B = yolg‘on. (NOT A) OR B natijasi?",o:["Rost","Yolg‘on","A ga teng","Bajarib bo‘lmaydi"],a:1,e:"NOT A = yolg‘on; yolg‘on OR yolg‘on = yolg‘on."},
+{g:10,t:"Python",q:"print(17 // 5, 17 % 5) nimani chiqaradi?",o:["3 2","2 3","3.4 2","4 1"],a:0,e:"// butun bo‘lishni (3), % qoldiqni (2) beradi."},
+{g:10,t:"Ma’lumotlar",q:"8 bitli unsigned sonning mumkin bo‘lgan qiymatlari oralig‘i?",o:["−128 dan 127 gacha","0 dan 255 gacha","0 dan 256 gacha","−255 dan 255 gacha"],a:1,e:"8 bit 2⁸ = 256 ta qiymat beradi: 0–255."},
+{g:10,t:"Sanoq sistemalari",q:"O‘n oltilik sanoq sistemasidagi A3 sonining o‘nlik qiymati?",o:["153","163","173","183"],a:1,e:"A3₁₆ = 10×16 + 3 = 163."},
+{g:10,t:"Python",q:"x = [4, 7, 2]; print(x[1]) natijasi?",o:["4","7","2","1"],a:1,e:"Python ro‘yxatlarida indeks 0 dan boshlanadi: x[1] — ikkinchi element."},
+{g:10,t:"Algoritmlar",q:"Saralangan ro‘yxatda ikkilik qidiruvning vaqt murakkabligi?",o:["O(n)","O(n²)","O(log n)","O(1) har doim"],a:2,e:"Har qadamda qidiruv oralig‘i taxminan yarmiga qisqaradi: O(log n)."},
+{g:10,t:"Kompyuter savodxonligi",q:"Tarmoqda IP-manzilning asosiy vazifasi nima?",o:["Monitor rangini belgilash","Qurilmani tarmoqda manzillash","Faylni siqish","Parolni shifrlash"],a:1,e:"IP-manzil tarmoqdagi qurilma/interfeysni aniqlash va paketlarni yo‘naltirishga yordam beradi."},
+{g:10,t:"Python",q:"Kod natijasi: s=0; for i in range(1,4): s+=i; print(s)",o:["3","4","6","10"],a:2,e:"s = 1 + 2 + 3 = 6."},
+{g:10,t:"Mantiq",q:"A XOR B qachon rost bo‘ladi?",o:["Ikkalasi rost bo‘lsa","Ikkalasi yolg‘on bo‘lsa","Qiymatlar turlicha bo‘lsa","Har doim"],a:2,e:"XOR aynan bitta operand rost bo‘lganda rost."},
+{g:10,t:"Ma’lumotlar",q:"Ikkilikda 1111 + 0001 natijasi?",o:["1110","10000","10100","11111"],a:1,e:"15 + 1 = 16, ikkilikda 10000."},
+{g:10,t:"Python",q:"Python’da 2 ** 5 ifodasi nimani hisoblaydi?",o:["2×5","2⁵","5²","2+5"],a:1,e:"** darajaga ko‘tarish operatori: 2⁵ = 32."},
+{g:10,t:"Algoritmlar",q:"Ichma-ich ikkita n martalik siklning oddiy holatdagi murakkabligi ko‘pincha qanday?",o:["O(n)","O(log n)","O(n²)","O(1)"],a:2,e:"Har tashqi takrorlashda ichki sikl n marta ishlasa, jami n×n = n²."},
+
+{g:11,t:"Python",q:"Funksiya f(n)=n*n bo‘lsa, f(6) qiymati?",o:["12","18","36","64"],a:2,e:"f(6) = 6×6 = 36."},
+{g:11,t:"Algoritmlar",q:"Merge sort algoritmining odatiy vaqt murakkabligi?",o:["O(n²)","O(n log n)","O(log n)","O(1)"],a:1,e:"Merge sort bo‘lish va birlashtirish orqali O(n log n) vaqtda ishlaydi."},
+{g:11,t:"Python",q:"Kod natijasi: a=[1,2,3,4]; print(a[1:3])",o:["[1, 2]","[2, 3]","[2, 3, 4]","[1, 2, 3]"],a:1,e:"Kesimda boshlang‘ich indeks kiradi, oxirgi indeks kirmaydi: 1 va 2 indekslar."},
+{g:11,t:"Sanoq sistemalari",q:"Ikkilik 11010 sonining o‘nlik qiymati?",o:["24","25","26","28"],a:2,e:"11010₂ = 16 + 8 + 2 = 26."},
+{g:11,t:"Algoritmlar",q:"Grafdagi BFS algoritmi odatda qaysi ma’lumot tuzilmasidan foydalanadi?",o:["Stek","Navbat","Faqat massivni saralash","Heap sort"],a:1,e:"BFS tugunlarni qatlamma-qatlam ko‘rish uchun navbatdan foydalanadi."},
+{g:11,t:"Python",q:"Kod natijasi: def f(n): return 1 if n==0 else n*f(n-1); print(f(4))",o:["10","16","24","32"],a:2,e:"Bu faktorial: 4! = 4×3×2×1 = 24."},
+{g:11,t:"Ma’lumotlar",q:"Hash-jadvalda kolliziya nimani anglatadi?",o:["Jadval bo‘shligini","Ikki kalit bir xil slot/indeksga tushishini","Kalitlar saralanganini","Ma’lumot o‘chirilganini"],a:1,e:"Kolliziya — turli kalitlar bir xil xesh manziliga mos kelishi."},
+{g:11,t:"Algoritmlar",q:"Dijkstra algoritmi qaysi vazifa uchun ishlatiladi (manfiy bo‘lmagan og‘irliklarda)?",o:["Eng qisqa yo‘lni topish","Matnni siqish","Massivni teskari aylantirish","Sonni ikkilikka o‘tkazish"],a:0,e:"Dijkstra manfiy bo‘lmagan qirra og‘irliklarida eng qisqa yo‘llarni topadi."},
+{g:11,t:"Python",q:"Kod natijasi: print([x*x for x in range(4) if x%2==0])",o:["[0, 1, 4, 9]","[0, 4]","[1, 9]","[2, 4]"],a:1,e:"Juft x qiymatlari 0 va 2; ularning kvadratlari 0 va 4."},
+{g:11,t:"Mantiq",q:"Implikatsiya A → B qaysi holatda yolg‘on bo‘ladi?",o:["A yolg‘on, B yolg‘on","A yolg‘on, B rost","A rost, B yolg‘on","A rost, B rost"],a:2,e:"Implikatsiya faqat A rost va B yolg‘on bo‘lganda yolg‘on."},
+{g:11,t:"Algoritmlar",q:"Quyidagilardan qaysi biri FIFO tamoyiliga amal qiladi?",o:["Stek","Navbat","Rekursiya","Daraxt"],a:1,e:"FIFO — birinchi kirgan birinchi chiqadi; bu navbat tamoyili."},
+{g:11,t:"Python",q:"Python’da set([1,1,2,3]) nechta turli elementga ega?",o:["2","3","4","1"],a:1,e:"Set takroriy elementlarni olib tashlaydi: {1,2,3} — 3 ta."},
+{g:11,t:"Ma’lumotlar",q:"Grafda daraxt n ta tugunga ega bo‘lsa, qirralar soni nechta?",o:["n","n−1","n+1","2n"],a:1,e:"Bog‘langan, siklsiz daraxtda qirralar soni n−1 ga teng."},
+{g:11,t:"Algoritmlar",q:"Binary heapda ildiz tugun odatda qaysi qiymatni saqlaydi?",o:["Tasodifiy qiymat","Min-heapda eng kichik yoki max-heapda eng katta qiymat","Har doim o‘rtacha qiymat","Eng oxirgi qo‘shilgan qiymat"],a:1,e:"Heap turiga qarab ildiz minimal yoki maksimal element bo‘ladi."},
+{g:11,t:"Python",q:"Kod natijasi: x=10; y=3; print(x//y + x%y)",o:["3","4","5","6"],a:1,e:"10//3 = 3 va 10%3 = 1; yig‘indi 4."}
+];
+
+(function addExtraQuestions(){
+ const add=(g,t,q,o,a,e)=>Q.push({g,t,q,o,a,e});
+ for(let n=2;n<=13;n++){
+  add(9,"Python",`print(${n} + 3) natijasi?`,[String(n+2),String(n+3),String(n*3),String(n-3)],1,`${n} + 3 = ${n+3}.`);
+  add(9,"Sanoq sistemalari",`O‘nlik ${n} sonining ikkilik yozuvi qaysi?`,[n.toString(2),(n+1).toString(2),(n+2).toString(2),(n*2).toString(2)],0,`${n} sonining ikkilik yozuvi ${n.toString(2)}₂.`);
+  add(9,"Ma’lumotlar",`${n} bayt necha bitga teng?`,[String(n*4),String(n*8),String(n*16),String(n+8)],1,`1 bayt = 8 bit, demak ${n} × 8 = ${n*8} bit.`);
+  add(10,"Python",`print(${n} // 3) natijasi?`,[String(Math.floor(n/3)+1),String(Math.floor(n/3)),String(n%3),String(n)],1,`${n} ni 3 ga butun bo‘lsak ${Math.floor(n/3)} chiqadi.`);
+  add(10,"Python",`print(${n} % 4) natijasi?`,[String(n%4),String(Math.floor(n/4)),String((n+1)%4),"4"],0,`Qoldiq: ${n} % 4 = ${n%4}.`);
+  add(10,"Mantiq",`A=rost, B=${n%2===0?"rost":"yolg‘on"}. A AND B natijasi?`,["Rost","Yolg‘on","A emas","Aniqlanmaydi"],n%2===0?0:1,n%2===0?"Ikkala qiymat ham rost.":"AND uchun ikkala qiymat rost bo‘lishi kerak.");
+  add(11,"Algoritmlar",`n=${n} ta elementni bir martadan tekshirish nechta tekshiruv?`,[String(n+1),String(n),String(n*n),"1"],1,`Har bir element bir marta tekshirilsa, ${n} ta tekshiruv bo‘ladi.`);
+ }
+ const fixed=[
+ [9,"Kompyuter savodxonligi","Qaysi qurilma ma’lumotni qog‘ozga chiqaradi?",["Skaner","Printer","Mikrofon","Klaviatura"],1,"Printer hujjat yoki tasvirni qog‘ozga chiqaradi."],
+ [9,"Algoritmlar","Blok-sxemada boshlash/tugatish odatda qaysi shaklda ko‘rsatiladi?",["Oval","Romb","To‘g‘ri to‘rtburchak","Uchburchak"],0,"Oval boshlash yoki tugashni bildiradi."],
+ [10,"Kompyuter savodxonligi","CPU nimaning qisqartmasi?",["Markaziy protsessor","Tezkor xotira","Tarmoq kabeli","Grafik fayl"],0,"CPU — markaziy protsessor."],
+ [10,"Ma’lumotlar","Ikkilik 1000000 soni o‘nlikda nechaga teng?",["32","64","128","16"],1,"1000000₂ = 2⁶ = 64."],
+ [10,"Algoritmlar","Barcha n ta elementni bir martadan ko‘rish murakkabligi?",["O(1)","O(log n)","O(n)","O(n²)"],2,"Har element bir marta tekshirilsa, murakkablik O(n)."],
+ [11,"Algoritmlar","Grafdagi qirra nimani bog‘laydi?",["Tugunlarni","Fayl kengaytmalarini","Faqat massiv indekslarini","Pikselni"],0,"Graf qirrasi tugunlar orasidagi bog‘lanishni ifodalaydi."],
+ [11,"Python","print(len([4,5,6,7])) natijasi?",["3","4","5","7"],1,"Ro‘yxatda 4 ta element bor."],
+ [11,"Ma’lumotlar","FIFO qoidasi nimani bildiradi?",["Oxirgi kirgan birinchi chiqadi","Birinchi kirgan birinchi chiqadi","Eng kichik chiqadi","Tasodifiy chiqadi"],1,"FIFO — First In, First Out."],
+ [11,"Sanoq sistemalari","O‘nlik 255 sonining 8 bitli ikkilik yozuvi?",["11111111","11111110","10000000","10101010"],0,"255 = 2⁸−1, yozuvi 11111111."],
+ [11,"Python","print(4**2) natijasi?",["8","12","16","24"],2,"4² = 16."],
+ [11,"Python","print(11//2) natijasi?",["5","5.5","6","2"],0,"11 // 2 = 5."],
+ [11,"Algoritmlar","Rekursiya nima?",["Funksiyaning o‘zini chaqirishi","Ma’lumotni shifrlash","Tarmoq protokoli","Fayl turi"],0,"Rekursiv funksiya o‘zini chaqiradi."],
+ [11,"Python","print(3 in [1,2,3]) natijasi?",["True","False","3","None"],0,"3 ro‘yxatda bor, shuning uchun True."],
+ [10,"Kompyuter savodxonligi","DNS odatda nima qiladi?",["Domen nomini IP-manzilga moslaydi","Monitorni sozlaydi","Faylni siqadi","Kod yozadi"],0,"DNS domen nomlarini IP-manzillarga moslaydi."],
+ [9,"Ma’lumotlar","Raqamli tasvirning eng kichik nuqtasi nima?",["Bayt","Piksel","Bit","Kadr"],1,"Piksel tasvirning eng kichik elementi."]
+ ];
+ fixed.forEach(x=>add(...x));
+ let k=1;
+ while(Q.length<150){
+  const n=20+k, kind=k%5;
+  if(kind===0)add(9,"Python",`print(${n} - 7) natijasi?`,[String(n-7),String(n+7),String(n*7),String(7-n)],0,`${n} − 7 = ${n-7}.`);
+  else if(kind===1)add(10,"Python",`print(${n} % 5) natijasi?`,[String(n%5),String(Math.floor(n/5)), "5", String(n)],0,`${n} ni 5 ga bo‘lgandagi qoldiq ${n%5}.`);
+  else if(kind===2)add(11,"Sanoq sistemalari",`Ikkilik ${n.toString(2)} sonining o‘nlik qiymati?`,[String(n+1),String(n),String(n*2),String(n-1)],1,`${n.toString(2)}₂ = ${n}.`);
+  else if(kind===3)add(10,"Algoritmlar",`n=${n} bo‘lsa, n ta elementni bir martadan tekshirish nechta amal?`,[String(n-1),String(n),String(n*n),"1"],1,`Har bir element bir marta tekshiriladi: ${n} amal.`);
+  else add(11,"Python",`print(${n} * 2) natijasi?`,[String(n+2),String(n*2),String(n*3),String(n)],1,`${n} × 2 = ${n*2}.`);
+  k++;
+ }
+})();
+
+let active = [];
+let answers = {};
+let pos = 0;
+let submitted = false;
+const $ = id => document.getElementById(id);
+
+function shuffle(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+function getFilteredQuestions() {
+  const grade = $('grade').value;
+  const topic = $('topic').value;
+  return Q.filter(q =>
+    (grade === 'all' || String(q.g) === grade) &&
+    (topic === 'all' || q.t === topic)
+  );
+}
+function startTest() {
+  const pool = getFilteredQuestions();
+  if (!pool.length) {
+    alert('Bu tanlov uchun savol topilmadi. Boshqa sinf yoki mavzuni tanlang.');
+    return;
+  }
+  const requested = $('count').value;
+  const amount = requested === 'all' ? pool.length : Math.min(Number(requested), pool.length);
+  active = shuffle(pool).slice(0, amount);
+  answers = {};
+  pos = 0;
+  submitted = false;
+
+  $('intro').classList.add('hidden');
+  $('results').classList.add('hidden');
+  $('testArea').classList.remove('hidden');
+  $('testTitle').textContent = $('grade').value === 'all'
+    ? 'Aralash test'
+    : $('grade').value + '-sinf testi';
+  $('testSub').textContent = active.length + ' ta savol · Har bir savol 1 ball';
+  renderQuestion();
+  $('testArea').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+function renderQuestion() {
+  if (!active.length) return;
+  const q = active[pos];
+  $('counter').textContent = (pos + 1) + ' / ' + active.length;
+  $('progressFill').style.width = ((pos + 1) / active.length * 100) + '%';
+  $('prevBtn').disabled = pos === 0;
+  $('nextBtn').disabled = pos === active.length - 1 || (!submitted && answers[pos] === undefined);
+  $('submitBtn').classList.toggle('hidden', submitted);
+
+  const options = q.o.map((option, i) => {
+    const selected = answers[pos] === i;
+    const disabled = submitted ? 'disabled' : '';
+    return `<label class="option ${selected ? 'chosen' : ''}">
+      <input type="radio" name="answer" value="${i}" ${selected ? 'checked' : ''} ${disabled}>
+      <span><b>${String.fromCharCode(65 + i)}.</b> ${option}</span>
+    </label>`;
+  }).join('');
+
+  let feedback = '';
+  if (submitted) {
+    const isCorrect = answers[pos] === q.a;
+    feedback = `<div class="feedback">
+      <div class="${isCorrect ? 'correct' : 'wrong'}">${isCorrect ? 'To‘g‘ri!' : 'Noto‘g‘ri yoki javob berilmagan.'}</div>
+      <div><b>To‘g‘ri javob:</b> ${String.fromCharCode(65 + q.a)}. ${q.o[q.a]}</div>
+      <div style="margin-top:5px">${q.e}</div>
+    </div>`;
+  }
+
+  $('questionMount').innerHTML = `<div class="question">
+    <div class="qmeta"><span>${q.g}-sinf</span><span>•</span><span>${q.t}</span><span>•</span><span>Savol ${pos + 1}</span></div>
+    <h3>${q.q}</h3><div>${options}</div>${feedback}
+  </div>`;
+}
+function showResults() {
+  if (!active.length) return;
+  submitted = true;
+  const correct = active.reduce((sum, q, i) => sum + (answers[i] === q.a ? 1 : 0), 0);
+  const wrong = active.length - correct;
+  const percent = Math.round(correct / active.length * 100);
+  const topics = {};
+  active.forEach((q, i) => {
+    if (!topics[q.t]) topics[q.t] = {right: 0, total: 0};
+    topics[q.t].total++;
+    if (answers[i] === q.a) topics[q.t].right++;
+  });
+
+  const topicHtml = Object.entries(topics).map(([topic, score]) => {
+    const rate = Math.round(score.right / score.total * 100);
+    return `<div><p><b>${topic}:</b> ${score.right}/${score.total} (${rate}%)</p>
+      <div class="progress"><div style="width:${rate}%"></div></div></div>`;
+  }).join('');
+
+  const errors = active.map((q, i) => ({q, i})).filter(item => answers[item.i] !== item.q.a);
+  const errorHtml = errors.length ? errors.map(({q, i}) => `<details>
+    <summary>${i + 1}. ${q.q}</summary>
+    <p><span class="wrong">Sening javobing:</span> ${answers[i] === undefined ? 'Javob tanlanmagan' : String.fromCharCode(65 + answers[i]) + '. ' + q.o[answers[i]]}</p>
+    <p><span class="correct">To‘g‘ri javob:</span> ${String.fromCharCode(65 + q.a)}. ${q.o[q.a]}</p>
+    <p>${q.e}</p><p class="muted">Mavzu: ${q.t} · ${q.g}-sinf</p>
+  </details>`).join('') : '<p class="correct">Ajoyib! Barcha savollarga to‘g‘ri javob berding.</p>';
+
+  $('results').innerHTML = `<div class="resultbox">
+    <div class="topline"><h2>Natijang</h2><span class="pill">${percent}%</span></div>
+    <div class="resultgrid">
+      <div class="stat"><strong>${correct}</strong><span>To‘g‘ri</span></div>
+      <div class="stat"><strong>${wrong}</strong><span>Xato / javobsiz</span></div>
+      <div class="stat"><strong>${active.length}</strong><span>Jami savol</span></div>
+    </div>
+    <h3>Mavzular bo‘yicha tahlil</h3>${topicHtml}
+    <h3>Xato va javobsiz savollar</h3>${errorHtml}
+    <div class="actions"><button class="btn" id="retryBtn" type="button">Yangi test</button>
+    <button class="btn secondary" id="reviewBtn" type="button">Barcha javoblarni ko‘rish</button></div>
+  </div>`;
+  $('results').classList.remove('hidden');
+  renderQuestion();
+  $('results').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+function resetPage() {
+  answers = {};
+  active = [];
+  submitted = false;
+  pos = 0;
+  $('testArea').classList.add('hidden');
+  $('results').classList.add('hidden');
+  $('intro').classList.remove('hidden');
+}
+$('startBtn').addEventListener('click', startTest);
+$('resetBtn').addEventListener('click', resetPage);
+$('prevBtn').addEventListener('click', () => {
+  if (pos > 0 && active.length) { pos--; renderQuestion(); }
+});
+$('nextBtn').addEventListener('click', () => {
+  if (!submitted && answers[pos] === undefined) {
+    alert('Avval javob variantini tanlang.');
+    return;
+  }
+  if (pos < active.length - 1) { pos++; renderQuestion(); }
+});
+$('submitBtn').addEventListener('click', showResults);
+$('questionMount').addEventListener('change', event => {
+  if (event.target.matches('input[name="answer"]') && !submitted) {
+    answers[pos] = Number(event.target.value);
+    renderQuestion();
+  }
+});
+$('results').addEventListener('click', event => {
+  if (event.target.closest('#retryBtn')) startTest();
+  if (event.target.closest('#reviewBtn')) {
+    pos = 0;
+    renderQuestion();
+    $('testArea').scrollIntoView({behavior: 'smooth', block: 'start'});
+  }
+});
+$('totalCount').textContent = Q.length + ' ta';
+</script>
+</body>
+</html>
